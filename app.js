@@ -1,10 +1,14 @@
 const board = document.querySelector('.board')
+const randomBtn = document.querySelector('#random-btn')
 const startBtn = document.querySelector('#start-btn')
 const stopBtn = document.querySelector('#stop-btn')
 const stepBtn = document.querySelector('#step-btn')
+const clearBtn = document.querySelector('#clear-btn')
+const intervalTimeInput = document.querySelector('#time')
 const boardSize = 30
 
 let interval
+let isRun = false
 
 const boardArray = []
 
@@ -55,6 +59,23 @@ function numbersOfLivingNeighbors(x, y) {
   return neighbors.reduce((a, e) => a + e)
 }
 
+function randomizeBoard() {
+  for (let i = 0; i < boardArray.length; i++) {
+    for (let j = 0; j < boardArray[i].length; j++) {
+      boardArray[i][j][0] = Math.round(Math.random() - 0.25)
+    }
+  }
+}
+
+function resetBoard() {
+  for (let i = 0; i < boardArray.length; i++) {
+    for (let j = 0; j < boardArray[i].length; j++) {
+      boardArray[i][j][0] = 0
+      boardArray[i][j][1] = 0
+    }
+  }
+}
+
 function step() {
   const cells = board.querySelectorAll('.cell')
   cells.forEach(cell => {
@@ -83,10 +104,31 @@ board.addEventListener('click', e => {
   }
 })
 
-startBtn.addEventListener('click', () => {
-  interval = setInterval(step, 200)
+randomBtn.addEventListener('click', () => {
+  randomizeBoard()
+  paintCells()
 })
 
-stopBtn.addEventListener('click', () => clearInterval(interval))
+startBtn.addEventListener('click', () => {
+  if (!isRun) {
+    interval = setInterval(step, +intervalTimeInput.value)
+    isRun = true
+    board.style.backgroundColor = 'rgba(162, 252, 162, 0.1)'
+    intervalTimeInput.setAttribute('disabled', 'disabled')
+  }
+})
+
+stopBtn.addEventListener('click', () => {
+  clearInterval(interval)
+  isRun = false
+  board.style.backgroundColor = 'rgba(247, 166, 166, 0.1)'
+  intervalTimeInput.removeAttribute('disabled', 'disabled')
+})
 
 stepBtn.addEventListener('click', step)
+
+clearBtn.addEventListener('click', () => {
+  resetBoard()
+  paintCells()
+  board.style.backgroundColor = '#fff'
+})
